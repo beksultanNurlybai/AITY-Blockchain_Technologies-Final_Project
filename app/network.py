@@ -2,6 +2,7 @@ import requests
 import websocket
 import os
 import json
+from tkinter import messagebox
 from core import *
 
 
@@ -57,11 +58,25 @@ def on_pc_info_event():
     pc_info = get_pc_info()
     send_pc_info(pc_info)
 
-def on_message(ws, message):
+def on_login_event(ws, data, root):
+    """Handles the login event after key validation."""
+    if data['is_valid']:
+        print("Login successful!")
+        messagebox.showinfo("Success", "Login successful! Continuing...")
+    else:
+        print("Invalid key.")
+        messagebox.showerror("Login Failed", "Invalid key! Please try again.")
+        root.key_entry.config(state="normal")
+        root.submit_button.config(state="normal")
+
+def on_message(ws, message, root):
     """Handles messages received from the server."""
     print(f"Received message from server: {message}")
     data = json.loads(message)
-    if data['event'] == "new_file":
+    
+    if data['event'] == "login":
+        on_login_event(ws, data, root)
+    elif data['event'] == "new_file":
         on_new_file_event(data)
     elif data['event'] == "pc_info":
         on_pc_info_event()
@@ -80,13 +95,15 @@ def on_open(ws):
     """Handles WebSocket connection establishment."""
     print("### WebSocket connection established ###")
 
-def connect():
+def connect(key, root):
     """Initiates a WebSocket connection and runs it indefinitely."""
     ws = websocket.WebSocketApp(
-        "ws://localhost:3000",
+        f"ws://localhost:3000?key={key}",
         on_open=on_open,
-        on_message=on_message,
+        on_message=lambda ws, message: on_message(ws, message, root),
         on_error=on_error,
         on_close=on_close
     )
     ws.run_forever()
+
+
