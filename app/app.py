@@ -1,4 +1,4 @@
-from connection import connect
+from network import connect
 
 if __name__ == '__main__':
     connect()

@@ -50,6 +50,12 @@ app.get('/api/files/:filename', (req, res) => {
     res.sendFile(filePath);
 });
 
+app.post('/api/results', (req, res) => {
+    const file_output = req.body.file_output;
+    console.log(file_output);
+    res.json({ message: 'file execution output uploaded.' });
+});
+
 // WebSocket connection handling
 wss.on('connection', (ws) => {
     console.log('Client connected via WebSocket');
@@ -64,7 +70,6 @@ wss.on('connection', (ws) => {
     });
 });
 
-// Start the server
 server.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
 });
