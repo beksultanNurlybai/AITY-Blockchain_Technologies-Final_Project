@@ -8,9 +8,9 @@ const mainController = require('./controllers/mainController');
 router.get('/main', mainController.mainPage);
 router.post('/register', userController.register);
 router.post('/login', userController.login);
-router.post('/logout', userController.logout);
+// router.post('/logout', userController.logout);
 
-router.get('/profile', mainController.profilePage);
-router.get('/upload', mainController.upload);
+// router.get('/profile', mainController.profilePage);
+router.post('/upload', fileController.upload);
 
 module.exports = router;

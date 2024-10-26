@@ -97,6 +97,5 @@ const sendMessageToClientApp = (provider_id, message) => {
         console.log(`Provider ${provider_id} is not connected or WebSocket is not open.`);
     }
 };
-// 0x123456789abcdef
-// 5f46b07bae09ff1b407f
+
 module.exports = { initWebSocket, sendMessageToClientApp };

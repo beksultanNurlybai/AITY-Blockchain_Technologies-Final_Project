@@ -1,24 +1,19 @@
 const express = require('express');
-const http = require('http');
-const connectDB = require('./config/db');
+const connectDB = require('./db');
 const { initWebSocket } = require('./controllers/websocketController');
-const userRoutes = require('./routes/userRoutes');
-const fileRoutes = require('./routes/fileRoutes');
-const resourceRoutes = require('./routes/resourceRoutes');
+const routes = require('./routes');
 
 const port = process.env.PORT || 3000;
 const app = express();
-const server = http.createServer(app);
 
 app.use(express.json());
+
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
 
-connectDB();
+app.use('/', routes);
 
-app.use('/api/users', userRoutes);
-app.use('/api', fileRoutes);
-app.use('/', resourceRoutes);
+connectDB();
 
 initWebSocket();
 
