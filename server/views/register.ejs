@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <header class="bg-dark text-white text-center py-4">
+        <h1>Marketplace</h1>
+        <nav>
+            <a class="text-white mr-4" href="/register">Register</a>
+            <a class="text-white" href="/login">Login</a>
+        </nav>
+    </header>
+
+    <div class="container my-4">
+        <h2>Register</h2>
+        <form action="/register" method="POST">
+            <div class="form-group">
+                <label for="role">Select Role</label>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="role" id="provider" value="provider" required>
+                    <label class="form-check-label" for="provider">
+                        Provider
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="role" id="renter" value="renter" required>
+                    <label class="form-check-label" for="renter">
+                        Renter
+                    </label>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Register</button>
+        </form>
+    </div>
+</body>
+</html>

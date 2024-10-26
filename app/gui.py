@@ -7,7 +7,7 @@ class App:
     def __init__(self, root):
         self.root = root
         self.root.title("WebSocket Connection")
-        self.root.geometry("400x300")
+        self.root.geometry("500x300")
         self.root.configure(bg="#f0f0f0")
 
         self.create_login_screen()

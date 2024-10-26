@@ -1,21 +1,27 @@
 const express = require('express');
-const fs = require('fs');
-const path = require('path');
 const http = require('http');
-const WebSocket = require('ws');
-const url = require('url');
 const connectDB = require('./config/db');
+const { initWebSocket } = require('./controllers/websocketController');
+const userRoutes = require('./routes/userRoutes');
+const fileRoutes = require('./routes/fileRoutes');
+const resourceRoutes = require('./routes/resourceRoutes');
 
+const port = process.env.PORT || 3000;
 const app = express();
 const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
-const port = 3000;
 
-// Connect to MongoDB
+app.use(express.json());
+app.set('view engine', 'ejs');
+app.use(express.static('public'));
+
 connectDB();
 
-// Your existing code...
+app.use('/api/users', userRoutes);
+app.use('/api', fileRoutes);
+app.use('/', resourceRoutes);
 
-server.listen(port, () => {
+initWebSocket();
+
+app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
 });

@@ -5,44 +5,41 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true,
+        index: true,
     },
     role: {
         type: String,
-        enum: ['owner', 'renter'],
+        enum: ['provider', 'renter'],
         required: true,
     },
     key: {
         type: String,
+        unique: true,
+        index: true,
         required: function() {
-            return this.role === 'owner';
+            return this.role === 'provider';
+        },
+    },
+    is_active: {
+        type: Boolean,
+        required: function() {
+            return this.role === 'provider';
         },
     },
     resource: {
         processor_name: {
             type: String,
-            required: function() {
-                return this.role === 'owner';
-            },
         },
         cpu_count: {
             type: Number,
-            required: function() {
-                return this.role === 'owner';
-            },
         },
         ram_size: {
             type: Number,
-            required: function() {
-                return this.role === 'owner';
-            },
         },
     },
     provider_id: {
         type: String,
         ref: 'User',
-        required: function() {
-            return this.role === 'renter';
-        },
     },
 }, { timestamps: true });
 

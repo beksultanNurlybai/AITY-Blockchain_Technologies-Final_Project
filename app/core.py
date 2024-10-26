@@ -1,27 +1,19 @@
-import platform
 import psutil
 import subprocess
 import sys
+import cpuinfo
 
 def get_pc_info():
     info = {}
     
-    os_info = platform.uname()
-    info["Processor"] = os_info.processor
-    info["CPU Count"] = psutil.cpu_count(logical=True)
-    info["CPU Percent Usage"] = psutil.cpu_percent(interval=1)
+    info["processor_name"] = cpuinfo.get_cpu_info()['brand_raw']
+    info["cpu_count"] = psutil.cpu_count(logical=True)
+    info["cpu_usage"] = psutil.cpu_percent(interval=1)
 
     virtual_memory = psutil.virtual_memory()
-    info["Total RAM (MB)"] = virtual_memory.total // (1024 ** 2)
-    info["Available RAM (MB)"] = virtual_memory.available // (1024 ** 2)
-    info["Used RAM (MB)"] = virtual_memory.used // (1024 ** 2)
-    info["RAM Percent Usage"] = virtual_memory.percent
-
-    disk_usage = psutil.disk_usage('/')
-    info["Total Disk Space (GB)"] = disk_usage.total // (1024 ** 3)
-    info["Used Disk Space (GB)"] = disk_usage.used // (1024 ** 3)
-    info["Free Disk Space (GB)"] = disk_usage.free // (1024 ** 3)
-    info["Disk Percent Usage"] = disk_usage.percent
+    info["total_ram"] = virtual_memory.total // (1024 ** 2)
+    info["available_ram"] = virtual_memory.available // (1024 ** 2)
+    info["ram_usage"] = virtual_memory.percent
 
     return info
 
