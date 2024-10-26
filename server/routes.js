@@ -5,10 +5,10 @@ const fileController = require('./controllers/fileController');
 const mainController = require('./controllers/mainController');
 
 
-router.get('/main', mainController.mainPage);
+router.get('/', mainController.mainPage);
 router.post('/register', userController.register);
 router.post('/login', userController.login);
-// router.post('/logout', userController.logout);
+router.get('/logout', userController.logout);
 
 // router.get('/profile', mainController.profilePage);
 router.post('/upload', fileController.upload);

@@ -3,56 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Marketplace</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Decentralized Computational Resource Sharing Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/connection.js"></script>
 </head>
 <body>
-    <header class="bg-dark text-white text-center py-4">
-        <h1>Marketplace</h1>
-        <nav>
-            <a class="text-white mr-4" href="/register">Register</a>
-            <a class="text-white" href="/login">Login</a>
+    <header>
+        <nav class="navbar fixed-top navbar-expand-lg bg-body-secondary">
+            <div class="container justify-content-between">
+                <ul class="navbar-nav text-white">
+                    <a class="navbar-brand" href="/main">Decentralized Computational Resource Sharing Platform</a>
+                    <li class="nav-item ms-5">
+                        <a class="nav-link" href="/main">Home</a>
+                    </li>
+                </ul>
+                <% if (session.user_id) { %>
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/workplace">workplace</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/logout">Logout</a>
+                        </li>
+                    </ul>
+                <% } else { %>
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="modal" data-bs-target="#registerModal" href="">Registration</a>
+                        </li>
+                    </ul>
+                <% } %>
+            </div>
         </nav>
-    </header>
 
-    <div class="container my-4">
-        <div class="row">
-            <!-- Card Example 1 -->
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">CPU Name: Intel i9</h5>
-                        <p class="card-text">CPU Count: 8</p>
-                        <p class="card-text">RAM Size: 32GB</p>
-                        <p class="card-text">Owner: 0x123456789abcdef</p>
-                    </div>
+        <!-- Registration Modal -->
+        <div class="modal fade" id="registerModal">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title">Registration</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-            </div>
-            <!-- Card Example 2 -->
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">CPU Name: AMD Ryzen 7</h5>
-                        <p class="card-text">CPU Count: 8</p>
-                        <p class="card-text">RAM Size: 16GB</p>
+                <form id="registrationForm" onsubmit="connectAccount(event)">
+                    <div class="modal-body">
+                        <h6>Select role:</h6>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="role" id="provider" value="provider" required>
+                            <label class="form-check-label" for="provider">Provider</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="role" id="renter" value="renter" required>
+                            <label class="form-check-label" for="renter">Renter</label>
+                        </div>
                     </div>
-                </div>
-            </div>
-            <!-- Card Example 3 -->
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">CPU Name: Intel i5</h5>
-                        <p class="card-text">CPU Count: 6</p>
-                        <p class="card-text">RAM Size: 8GB</p>
+                    <div class="d-flex modal-footer justify-content-between">
+                        <input id="rgbtn" type="submit" class="form-control text-bg-primary" value="Register" style="width: 80px;">
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
                     </div>
-                </div>
+                </form>
+              </div>
             </div>
         </div>
-    </div>
+    </header>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <div class="container my-4 mt-5 pt-5">
+        <div class="row">
+            <% resources.forEach(resource => { %>
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title"><%= resource.cpuName %></h5>
+                            <p class="card-text">
+                                CPU Count: <%= resource.cpuCount %><br>
+                                RAM Size: <%= resource.ramSize %> GB<br>
+                                Provider: <%= resource.provider_id %>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    </div>
 </body>
 </html>

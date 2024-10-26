@@ -8,10 +8,10 @@ exports.register = async (req, res) => {
         if (user) {
             return res.status(400).json({ message: 'User already exists' });
         }
+
         if (role == 'provider') {
             let key;
             let isUnique = false;
-
             while (!isUnique) {
                 key = crypto.randomBytes(20).toString('hex').slice(0, 20);
                 const existingKey = await User.findOne({ key });
@@ -19,26 +19,46 @@ exports.register = async (req, res) => {
             }
             user = new User({ user_id, role, key, is_active: false });
         } else {
-            user = new User({ user_id, role});
+            user = new User({ user_id, role });
         }
+
         await user.save();
 
-        res.status(201).json({ message: 'User registered successfully', user });
+        req.session.user_id = user.user_id;
+        req.session.role = user.role;
+        req.session.save((err) => {
+            if (err) {
+                console.error("Session save error:", err);
+                return res.status(500).json({ message: 'Failed to save session' });
+            }
+            res.redirect('/');
+        });
+
     } catch (err) {
+        console.error("Registration error:", err);
         res.status(500).json({ message: 'Server error' });
     }
 };
 
+
 exports.login = async (req, res) => {
     const { user_id } = req.body;
     try {
-        let user = await User.findOne({ user_id });
+        const user = await User.findOne({ user_id });
         if (!user) {
-            return res.status(400).json({ message: 'User not found' });
+            return res.status(400).json({ message: 'Invalid user ID' });
         }
-
-        res.status(200).json({ message: 'Login successful', user });
-    } catch (err) {
+        req.session.userId = user.user_id;
+        req.session.role = user.role;
+        res.redirect('/');
+    } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }
+};
+
+exports.logout = (req, res) => {
+    req.session.destroy((err) => {
+        if (err) return res.status(500).json({ message: 'Logout failed' });
+        res.redirect('/');
+    });
 };
