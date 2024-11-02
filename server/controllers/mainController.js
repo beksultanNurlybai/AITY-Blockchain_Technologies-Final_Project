@@ -17,5 +17,17 @@ exports.mainPage = async (req, res) => {
 };
 
 exports.workplacePage = async (req, res) => {
-    
+    try {
+        if (!req.session.user) {
+            return res.redirect('/');
+        }
+        const user = await User.findById({user_id: req.session.user_id});
+        if (!user) {
+            return res.redirect('/');
+        }
+        res.render('workplace', { user });
+    } catch (error) {
+        console.error("Error loading workplace page:", error);
+        res.status(500).send("Server error");
+    }
 };
