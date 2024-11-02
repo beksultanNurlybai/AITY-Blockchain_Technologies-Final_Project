@@ -10,7 +10,7 @@ router.post('/register', userController.register);
 router.post('/login', userController.login);
 router.get('/logout', userController.logout);
 
-// router.get('/profile', mainController.profilePage);
+router.get('/workplace', mainController.workplacePage);
 router.post('/upload', fileController.upload);
 
 module.exports = router;

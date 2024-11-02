@@ -14,8 +14,6 @@ const userSchema = new mongoose.Schema({
     },
     key: {
         type: String,
-        unique: true,
-        index: true,
         required: function() {
             return this.role === 'provider';
         },
@@ -42,6 +40,8 @@ const userSchema = new mongoose.Schema({
         ref: 'User',
     },
 }, { timestamps: true });
+
+userSchema.index({ key: 1 }, { unique: true, partialFilterExpression: { key: { $exists: true, $ne: null } } });
 
 const User = mongoose.model('User', userSchema);
 

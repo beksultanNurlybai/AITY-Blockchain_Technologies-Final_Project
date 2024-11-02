@@ -1,10 +1,11 @@
 async function connectAccount(event) {
-
+    event.preventDefault();
     if (window.ethereum) {
         try {
             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
             const userId = accounts[0];
-
+            console.log(accounts);
+            console.log(userId);
             const role = document.querySelector('input[name="role"]:checked').value;
 
             const data = {
@@ -21,9 +22,44 @@ async function connectAccount(event) {
             });
 
             if (response.ok) {
-                console.log("User registered successfully");
+                alert('User registered successfully');
+                window.location.href = '/';
             } else {
-                console.error("Error registering user:", await response.text());
+                alert("User already exists");
+            }
+        } catch (error) {
+            console.error("User denied account access", error);
+        }
+    } else {
+        alert('Non-Ethereum browser detected. Please install MetaMask!');
+        console.log('Non-Ethereum browser detected. Please install MetaMask!');
+    }
+}
+
+
+async function loginWithMetaMask() {
+    if (window.ethereum) {
+        try {
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+            const userId = accounts[0];
+
+            const data = {
+                user_id: userId
+            };
+
+            const response = await fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                alert('User logged in successfully');
+                window.location.href = '/';
+            } else {
+                console.error("Login error:", await response.text());
             }
         } catch (error) {
             console.error("User denied account access", error);

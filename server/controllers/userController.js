@@ -26,20 +26,13 @@ exports.register = async (req, res) => {
 
         req.session.user_id = user.user_id;
         req.session.role = user.role;
-        req.session.save((err) => {
-            if (err) {
-                console.error("Session save error:", err);
-                return res.status(500).json({ message: 'Failed to save session' });
-            }
-            res.redirect('/');
-        });
 
+        return res.status(200).json({ message: 'Registration successful' });
     } catch (err) {
         console.error("Registration error:", err);
-        res.status(500).json({ message: 'Server error' });
+        return res.status(500).json({ message: 'Server error' });
     }
 };
-
 
 exports.login = async (req, res) => {
     const { user_id } = req.body;
@@ -48,9 +41,10 @@ exports.login = async (req, res) => {
         if (!user) {
             return res.status(400).json({ message: 'Invalid user ID' });
         }
-        req.session.userId = user.user_id;
+        req.session.user_id = user.user_id;
         req.session.role = user.role;
-        res.redirect('/');
+
+        return res.status(200).json({ message: 'Login successful' });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }

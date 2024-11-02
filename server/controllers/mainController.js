@@ -9,10 +9,13 @@ exports.mainPage = async (req, res) => {
             ramSize: provider.resource.ram_size,
             provider_id: provider.user_id,
         }));
-        console.log(req.session);
-        res.render('index', { resources, session: req.session });
+        res.render('index', { resources, session: req.session, isAnyResource: resources.length != 0 });
     } catch (error) {
         console.error("Error fetching resources:", error);
         res.status(500).send("Internal Server Error");
     }
+};
+
+exports.workplacePage = async (req, res) => {
+    
 };
