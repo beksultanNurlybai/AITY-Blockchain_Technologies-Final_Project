@@ -59,7 +59,7 @@ async function loginWithMetaMask() {
                 alert('User logged in successfully');
                 window.location.href = '/';
             } else {
-                console.error("Login error:", await response.text());
+                alert('User is not registered.');
             }
         } catch (error) {
             console.error("User denied account access", error);

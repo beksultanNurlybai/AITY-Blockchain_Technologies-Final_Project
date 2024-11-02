@@ -15,7 +15,7 @@ class WebSocketClient:
         """Verify the login."""
         if data['is_valid']:
             print("Login successful.")
-            self.send_message("login_res", {"content": get_pc_info(), "key": self.key})
+            self.send_message("login_res", {"content": get_pc_info()})
             self.app.on_login_success()
         else:
             print("Login failed.")
@@ -29,11 +29,12 @@ class WebSocketClient:
     def on_new_file_event(self, data):
         """Execute the file and send the output results back to server."""
         filename = 'temp.py'
+        print(data)
         with open(filename, 'w') as file:
             file.write(data['content'])
         execution_results = execute_file(filename)
         print(f"File '{filename}' executed.\n{execution_results}")
-        self.send_message("new_file_res", {"content": execution_results, "key": self.key})
+        self.send_message("new_file_res", {"content": execution_results, "request_id": data['request_id']})
         os.remove(filename)
     
     def send_message(self, event, data):

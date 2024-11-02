@@ -3,14 +3,10 @@ const url = require('url');
 const User = require('../models/User');
 
 const userConnections = new Map();
+const fileResponseHandlers = new Map();
 
-async function on_login_event(data) {
+async function on_login_event(data, user) {
     try {
-        let user = await User.findOne({ key: data.key });
-        if (!user) {
-            console.error("Error: User not found");
-            return;
-        }
         user.resource = {
             processor_name: data.content.processor_name,
             cpu_count: data.content.cpu_count,
@@ -24,9 +20,15 @@ async function on_login_event(data) {
     }
 }
 
+function on_new_file_event(data) {
+    const { request_id, content } = data;
+    const handler = fileResponseHandlers.get(request_id);
 
-function on_new_file_event(data){
-    console.log(data);
+    if (handler) {
+        handler(content);
+    } else {
+        console.error(`No handler found for request_id: ${request_id}`);
+    }
 }
 
 function on_resource_data_event(data){
@@ -42,45 +44,45 @@ const initWebSocket = () => {
 
         try {
             const user = await User.findOne({ key });
-            if (user) {
-                console.log(`Client connected with valid key: ${key}`);
-                ws.send(JSON.stringify({ event: 'login_req', is_valid: true }));
-                userConnections.set(user.user_id, ws);
-
-                ws.on('message', (msg) => {
-                    const data = JSON.parse(msg);
-                    console.log('Message from client app:', data.event);
-                    switch (data.event) {
-                        case 'login_res':
-                            on_login_event(data);
-                            break;
-                        case 'new_file_res':
-                            on_new_file_event(data);
-                            break;
-                        case 'resource_data_res':
-                            on_resource_data_event(data);
-                            break;
-                        default:
-                            console.log(`Unhandled event: ${data.event}`);
-                    }
-                });
-
-                ws.on('close', async () => {
-                    console.log('Client disconnected');
-                    userConnections.delete(user.user_id);
-                    try {
-                        user.is_active = false;
-                        console.log(user.is_active);
-                        await user.save();
-                    } catch (error) {
-                        console.error("Error updating resource activity:", error);
-                    }
-                });
-            } else {
+            if (!user) {
                 console.log(`Client attempted connection with invalid key: ${key}`);
                 ws.send(JSON.stringify({ event: 'login_req', is_valid: false }));
                 ws.close();
+                return;
             }
+            console.log(`Client connected with valid key: ${key}`);
+            ws.send(JSON.stringify({ event: 'login_req', is_valid: true }));
+            userConnections.set(user.user_id, ws);
+
+            ws.on('message', (msg) => {
+                const data = JSON.parse(msg);
+                console.log('Message from client app:', data.event);
+                switch (data.event) {
+                    case 'login_res':
+                        on_login_event(data, user);
+                        break;
+                    case 'new_file_res':
+                        on_new_file_event(data);
+                        break;
+                    case 'resource_data_res':
+                        on_resource_data_event(data);
+                        break;
+                    default:
+                        console.log(`Unhandled event: ${data.event}`);
+                }
+            });
+
+            ws.on('close', async () => {
+                console.log('Client disconnected');
+                userConnections.delete(user.user_id);
+                try {
+                    user.is_active = false;
+                    console.log(user.is_active);
+                    await user.save();
+                } catch (error) {
+                    console.error("Error updating resource activity:", error);
+                }
+            });
         } catch (error) {
             console.error('Error validating key:', error);
             ws.send(JSON.stringify({ event: 'login_req', is_valid: false }));
@@ -98,4 +100,4 @@ const sendMessageToClientApp = (provider_id, message) => {
     }
 };
 
-module.exports = { initWebSocket, sendMessageToClientApp };
+module.exports = { initWebSocket, sendMessageToClientApp, fileResponseHandlers };
