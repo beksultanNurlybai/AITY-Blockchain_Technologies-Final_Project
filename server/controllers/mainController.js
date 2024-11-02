@@ -18,10 +18,10 @@ exports.mainPage = async (req, res) => {
 
 exports.workplacePage = async (req, res) => {
     try {
-        if (!req.session.user) {
+        if (!req.session.user_id) {
             return res.redirect('/');
         }
-        const user = await User.findById({user_id: req.session.user_id});
+        const user = await User.findOne({user_id: req.session.user_id});
         if (!user) {
             return res.redirect('/');
         }
