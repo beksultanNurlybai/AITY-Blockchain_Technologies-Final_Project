@@ -3,7 +3,6 @@ const {sendMessageToClientApp, fileResponseHandlers} = require('./websocketContr
 
 exports.upload = async (req, res) => {
     const content = req.body.content;
-    console.log(content);
     if (!req.session.user_id) {
         return res.status(403).send("Forbidden URL");
     }

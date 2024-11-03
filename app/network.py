@@ -2,6 +2,7 @@ import websocket
 import json
 import threading
 import os
+import time
 from core import *
 
 
@@ -10,21 +11,33 @@ class WebSocketClient:
         self.key = key
         self.app = app
         self.ws = None
+        self.resource_data_thread = None
+        self.is_connected = False
     
     def on_login_event(self, data):
         """Verify the login."""
         if data['is_valid']:
             print("Login successful.")
             self.send_message("login_res", {"content": get_pc_info()})
+            self.is_connected = True
             self.app.on_login_success()
         else:
             print("Login failed.")
             self.app.on_login_failed()
     
-    def on_resource_data_event(self):
-        """Sends the computer information to the server."""
-        self.send_message("resource_data_res", {"content": get_pc_info(), "key": self.key})
-        print(f"Resource data sent.\n{get_pc_info()}")
+    def on_resource_data_event(self, data):
+        """Continuously send resource data in a separate thread."""
+        self.is_connected = True
+        while self.is_connected:
+            self.send_message("resource_data_res", {"content": get_pc_info(), "user_id": data['user_id']})
+            time.sleep(1)
+
+    def start_resource_data_thread(self, data):
+        """Starts the resource data thread."""
+        if self.resource_data_thread is None or not self.resource_data_thread.is_alive():
+            self.resource_data_thread = threading.Thread(target=self.on_resource_data_event, args=(data,))
+            self.resource_data_thread.daemon = True
+            self.resource_data_thread.start()
     
     def on_new_file_event(self, data):
         """Execute the file and send the output results back to server."""
@@ -50,9 +63,8 @@ class WebSocketClient:
             on_error=self.on_error,
             on_close=self.on_close
         )
-        # Start WebSocket connection in a new thread so it doesn't block the GUI
         thread = threading.Thread(target=self.ws.run_forever)
-        thread.daemon = True  # Daemonize thread to close it when the app closes
+        thread.daemon = True
         thread.start()
 
     def on_message(self, ws, message):
@@ -64,7 +76,9 @@ class WebSocketClient:
         elif data['event'] == "new_file_req":
             self.on_new_file_event(data)
         elif data['event'] == "resource_data_req":
-            self.on_resource_data_event()
+            self.start_resource_data_thread(data)
+        elif data['event'] == "stop_resource_data":
+            self.is_connected = False
         else:
             print("An unhandled event occurred.")
 
@@ -76,6 +90,7 @@ class WebSocketClient:
     def on_close(self, ws, close_status_code, close_msg):
         """Handle WebSocket disconnection."""
         print("WebSocket connection closed.")
+        self.is_connected = False
         self.app.on_disconnect()
 
     def disconnect(self):

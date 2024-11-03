@@ -25,7 +25,13 @@ exports.workplacePage = async (req, res) => {
         if (!user) {
             return res.redirect('/');
         }
-        res.render('workplace', { user });
+
+        if (user.role == 'provider'){
+            const renter = await User.findOne({provider_id: user.user_id});
+            return res.render('workplace', { user, renter });
+        }
+        const provider = await User.findOne({user_id: user.provider_id});
+        return res.render('workplace', { user, provider });
     } catch (error) {
         console.error("Error loading workplace page:", error);
         res.status(500).send("Server error");
