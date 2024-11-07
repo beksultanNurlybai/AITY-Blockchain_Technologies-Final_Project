@@ -3,7 +3,10 @@ const router = express.Router();
 const userController = require('./controllers/userController');
 const fileController = require('./controllers/fileController');
 const mainController = require('./controllers/mainController');
+const contractController = require('./controllers/contractController');
 
+router.get('/contract-info', contractController.info);
+router.post('/register-provider', contractController.registerProvider);
 
 router.get('/', mainController.mainPage);
 router.post('/register', userController.register);
