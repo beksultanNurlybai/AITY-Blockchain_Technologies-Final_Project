@@ -1,9 +1,11 @@
 const { contract, web3 } = require('../web3');
+const User = require('../models/User');
+
 
 exports.info = async (req, res) => {
     try {
         const accounts = await web3.eth.getAccounts();
-        const provider = await contract.methods.providers(accounts[0]).call();
+        const provider = await contract.methods.providers(accounts[1]).call();
 
         const providerSerialized = Object.fromEntries(
             Object.entries(provider).map(([key, value]) =>
@@ -19,11 +21,15 @@ exports.info = async (req, res) => {
 
 exports.registerProvider = async (req, res) => {
     try {
-      const { pricePerMonth } = req.body;
-      const accounts = await web3.eth.getAccounts();
-      await contract.methods.registerProvider(pricePerMonth).send({ from: accounts[0] });
-      res.json({ success: true, message: 'Provider registered successfully' });
+        const { price, account } = req.body;
+        await contract.methods.registerProvider(price).send({ from: account });
+
+        const user = await User.findOne({user_id: account});
+        user.resource.price = price;
+        await user.save();
+        res.json({ success: true });
     } catch (error) {
-      res.status(500).json({ error: error.message });
+        console.error("Registration failed:", error);
+        res.status(500).send("Registration failed. Please try again.");
     }
 };

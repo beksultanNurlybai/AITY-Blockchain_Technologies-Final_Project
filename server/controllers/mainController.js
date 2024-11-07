@@ -2,12 +2,13 @@ const User = require('../models/User');
 
 exports.mainPage = async (req, res) => {
     try {
-        const providers = await User.find({ role: 'provider', resource: { $exists: true } }, ['user_id', 'resource']);
+        const providers = await User.find({ role: 'provider', 'resource.price': { $gt: 0 } }, ['user_id', 'resource']);
         const resources = providers.map(provider => ({
             cpuName: provider.resource.processor_name,
             cpuCount: provider.resource.cpu_count,
             ramSize: provider.resource.ram_size,
             provider_id: provider.user_id,
+            price: provider.resource.price
         }));
         res.render('index', { resources, session: req.session, isAnyResource: resources.length != 0 });
     } catch (error) {

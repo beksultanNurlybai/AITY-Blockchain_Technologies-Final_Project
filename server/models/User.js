@@ -34,6 +34,9 @@ const userSchema = new mongoose.Schema({
         ram_size: {
             type: Number,
         },
+        price: {
+            type: Number
+        }
     },
     provider_id: {
         type: String,

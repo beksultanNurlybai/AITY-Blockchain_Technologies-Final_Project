@@ -11,6 +11,7 @@ async function on_login_event(data, user) {
             processor_name: data.content.processor_name,
             cpu_count: data.content.cpu_count,
             ram_size: data.content.total_ram,
+            price: 0
         };
         user.is_active = true;
         await user.save();
@@ -65,7 +66,6 @@ const initWebSocket = () => {
     
                 ws.on('message', (msg) => {
                     const data = JSON.parse(msg);
-                    // console.log('Message from client app:', data.event);
                     switch (data.event) {
                         case 'login_res':
                             on_login_event(data, user);

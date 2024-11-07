@@ -214,7 +214,56 @@
                     <% } else { %>
                         <h5>Renter: nobody</h5>
                     <% } %>
+                    <h5>price: <%= user.resource.price %> wei</h5>
                 </div>
+                <div class="card mt-5 p-4 shadow-sm">
+                    <h5 class="mb-3">Set Price Per Month (in Wei):</h5>
+                    <form id="registerForm">
+                        <input type="hidden" id="account" value="<%= user.user_id %>">
+                        <div class="input-group">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                            <input type="text" class="form-control" id="price" placeholder="Enter price in Wei" required>
+                        </div>
+                    </form>
+                </div>
+                <script>
+                    document.getElementById("registerForm").addEventListener("submit", async function (e) {
+                        e.preventDefault();
+
+                        const price = document.getElementById("price").value;
+                        const account = document.getElementById("account").value;
+                
+                        if (!price || !account) {
+                            alert("Please enter both price and account.");
+                            return;
+                        }
+                
+                        const data = { price, account };
+                
+                        try {
+                            console.log(price, account);
+                            const response = await fetch("/register-provider", {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify(data),
+                            });
+                
+                            const textResponse = await response.text();
+                
+                            if (response.ok) {
+                                alert("Price successfully updated!");
+                                window.location.href = "/workplace";
+                            } else {
+                                alert(`Registration failed: ${result.error}`);
+                            }
+                        } catch (error) {
+                            console.error("Error during registration:", error);
+                            alert("An error occurred. Please try again.");
+                        }
+                    });
+                </script>                
             <% } else { %>
                 <div style="width: 100%; margin-top: 170px; text-align: center;">
                     <h2>You didn't connect to app.</h2>
