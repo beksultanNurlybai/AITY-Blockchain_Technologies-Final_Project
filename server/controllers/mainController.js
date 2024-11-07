@@ -25,7 +25,6 @@ exports.workplacePage = async (req, res) => {
         if (!user) {
             return res.redirect('/');
         }
-
         if (user.role == 'provider'){
             const renter = await User.findOne({provider_id: user.user_id});
             return res.render('workplace', { user, renter });
