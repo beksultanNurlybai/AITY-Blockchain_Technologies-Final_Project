@@ -56,3 +56,23 @@ exports.logout = (req, res) => {
         res.redirect('/');
     });
 };
+
+
+exports.buyResource = async (req, res) => {
+    try {
+        const { user_id, provider_id } = req.body;
+        
+        const user = await User.findOne({ user_id });
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+        
+        user.provider_id = provider_id;
+        await user.save();
+
+        res.status(200).json({ message: "Provider connected to renter successfully" });
+    } catch (error) {
+        console.error("Error saving provider-renter connection:", error);
+        res.status(500).json({ error: "An error occurred while connecting provider to renter" });
+    }
+};

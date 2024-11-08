@@ -22,7 +22,6 @@ exports.info = async (req, res) => {
 exports.registerProvider = async (req, res) => {
     try {
         const { price, account } = req.body;
-        await contract.methods.registerProvider(price).send({ from: account });
 
         const user = await User.findOne({user_id: account});
         user.resource.price = price;

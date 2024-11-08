@@ -17,6 +17,24 @@ exports.mainPage = async (req, res) => {
     }
 };
 
+exports.detailPage = async (req, res) => {
+    try {
+        if (!req.session.user_id) {
+            console.log(1);
+            return res.redirect('/');
+        }
+        const user = await User.findOne({user_id: req.session.user_id});
+        if (!user || user.role == 'provider') {
+            return res.redirect('/');
+        }
+        const provider = await User.findOne({user_id: req.params.id}, ['user_id', 'resource']);
+        res.render('detail', { user: provider, session: req.session });
+    } catch (error) {
+        console.error("Error fetching resources:", error);
+        res.status(500).send("Internal Server Error");
+    }
+};
+
 exports.workplacePage = async (req, res) => {
     try {
         if (!req.session.user_id) {
